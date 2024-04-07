@@ -1,4 +1,4 @@
-#Подключаем библиотеки
+# Подключаем библиотеки
 from tkinter import *
 from tkinter import messagebox
 import sqlite3
@@ -18,6 +18,8 @@ role TEXT NOT NULL
 #Функция регистрации
 def registr(user, password, role):
     cursor.execute('INSERT INTO Users (username, password, role) VALUES (?, ?, ?)', (user, password, role))
+    connection.commit()
+
 #Функция определения пользователя
 def check_cr():
     usernamevx = entry_username.get()
@@ -28,26 +30,18 @@ def check_cr():
     user = cursor.fetchone()
 
     #Проверяем существует ли пользователь с такими данными
-    while True:
-        if user is not None:
-            messagebox.showinfo("Успех", "Вход выполнен успешно!")
-            if user[2] == "ticher":
-                # Запуск программы для учителя
-                import ticher_programm
-                gui.destroy()
-                break
-            elif user[2] == "student":
-                # Запуск программы для студента
-                import student_programm
-                gui.destroy()
-                break
-        else:
-            messagebox.showerror("Ошибка", "Неверный логин или пароль")
+    if user is not None:
+        messagebox.showinfo("Успех", "Вход выполнен успешно!")
+        if user[2] == "teacher":
+            # Запуск программы для учителя
+            import ticher_programm
             gui.destroy()
-            break
-            
-    connection.commit()
-    connection.close()
+        elif user[2] == "student":
+            # Запуск программы для студента
+            import student_programm
+            gui.destroy()
+    else:
+        messagebox.showerror("Ошибка", "Неверный логин или пароль")
 
 #Окно регистрации и кнопки
 gui = Tk()
@@ -68,10 +62,10 @@ entry_password.grid(row=1, column=1, padx=5, pady=5)
 kn_login = Button(gui, text="Войти", command=check_cr)
 kn_login.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
-kn1_reg = Button(gui, text="Зарегистрироватся как ученик", command=lambda: registr(entry_username.get(), entry_password.get(), "student"))
+kn1_reg = Button(gui, text="Зарегистрироваться как ученик", command=lambda: registr(entry_username.get(), entry_password.get(), "student"))
 kn1_reg.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
 
-kn1_reg2 = Button(gui, text="Зарегистрироватся как учитель", command=lambda: registr(entry_username.get(), entry_password.get(), "ticher"))
+kn1_reg2 = Button(gui, text="Зарегистрироваться как учитель", command=lambda: registr(entry_username.get(), entry_password.get(), "teacher"))
 kn1_reg2.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
 gui.mainloop()
